@@ -2,8 +2,8 @@
 """
   Application of example from: http://www.ai-junkie.com/ga/intro/gat3.html
 """
-from base.Selection import Selection
-from base.Solution import Solution
+from Selection import Selection
+from Solution import Solution
 import config
 import settings
 

@@ -7,5 +7,5 @@ LOGGING={
 }
 
 DB={
-  'FILE_PATH' : '/home/herve/development/workspaces/learning/ai/genetic_algorithms/base/db/db'
+  'FILE_PATH' : '/home/herve/development/workspaces/learning/ai/genetic_algorithms/base/db'
 }

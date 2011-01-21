@@ -1,31 +1,37 @@
 #!/usr/bin/python
+from db import Da as Da
+
 class Db:
+  settings = None
+  
+  def __init__(self, settings):
+    self.settings = settings
     
-  @staticmethod
-  def save(solution):
-    import db
+  def save(self, solution):
+    da = Da(self.settings)
+    
     chromosomes=[]
     for i in range(solution.selection.population_nr):
-      chromo=db.execute('SELECT * FROM Chromosome WHERE bits=?', 'r', parameters=[str(solution.best_generation.chromosomes[i].bits)])
+      chromo=da.execute('SELECT * FROM Chromosome WHERE bits=?', 'r', parameters=[str(solution.best_generation.chromosomes[i].bits)])
       if not chromo:
-        db.execute('INSERT INTO Chromosome(bits) VALUES(?)', 'c', parameters=[str(solution.best_generation.chromosomes[i].bits)])
-        chromo=db.execute('SELECT * FROM Chromosome WHERE bits=?', 'r', parameters=[str(solution.best_generation.chromosomes[i].bits)])
+        da.execute('INSERT INTO Chromosome(bits) VALUES(?)', 'c', parameters=[str(solution.best_generation.chromosomes[i].bits)])
+        chromo=da.execute('SELECT * FROM Chromosome WHERE bits=?', 'r', parameters=[str(solution.best_generation.chromosomes[i].bits)])
       chromosomes.append(chromo)
     
-    problem_row=db.execute('SELECT * FROM Problem WHERE name=? and target=?', 'r', parameters=[solution.problem['NAME'], str(solution.problem['TARGET'])])
+    problem_row=da.execute('SELECT * FROM Problem WHERE name=? and target=?', 'r', parameters=[solution.problem['NAME'], str(solution.problem['TARGET'])])
     if not problem_row:
-      db.execute('INSERT INTO Problem(name, description, target) VALUES(?, ?, ?)', 'c', parameters=[solution.problem['NAME'], solution.problem['DESCRIPTION'], str(solution.problem['TARGET'])])
-      problem_row=db.execute('SELECT * FROM Problem WHERE name=? and target=?', 'r', parameters=[solution.problem['NAME'], str(solution.problem['TARGET'])])
+      da.execute('INSERT INTO Problem(name, description, target) VALUES(?, ?, ?)', 'c', parameters=[solution.problem['NAME'], solution.problem['DESCRIPTION'], str(solution.problem['TARGET'])])
+      problem_row=da.execute('SELECT * FROM Problem WHERE name=? and target=?', 'r', parameters=[solution.problem['NAME'], str(solution.problem['TARGET'])])
 
     solution.problem['ID']=int(problem_row[2])    
     prv_best_fitness_score=0
-    generation=db.execute('SELECT * FROM Solution WHERE Problem=?', 'r', parameters=[solution.problem['ID']])
+    generation=da.execute('SELECT * FROM Solution WHERE Problem=?', 'r', parameters=[solution.problem['ID']])
     if generation:
       for i in range(len(generation)): prv_best_fitness_score+=generation[i][2]
     
     if solution.best_generation.fitness_score>prv_best_fitness_score:
         solution.best_fitness_score=solution.best_generation.fitness_score
-        db.execute('DELETE FROM Solution WHERE Problem=?', 'd', parameters=[solution.problem['ID']])
+        da.execute('DELETE FROM Solution WHERE Problem=?', 'd', parameters=[solution.problem['ID']])
         tuples=[]
         for i in range(solution.selection.population_nr):
           tuples.append(
@@ -37,8 +43,10 @@ class Db:
                   solution.best_generation.chromosomes[i].solution
                 )
           )
-        db.bulk_execute(
+        da.bulk_execute(
           'INSERT INTO Solution(Problem, Chromosome, fitness_score, sequence, solution) VALUES(?, ?, ?, ?, ?) ', 'c', tuples=tuples)
     else:
         solution.best_fitness_score=prv_best_fitness_score
+
+    da.close()
 
