@@ -1,0 +1,16 @@
+"Base classes for Genetic Algorithms Computation"
+"###############################################"
+
+Inheritance
+    Overrides:
+        Chromosome:
+            solution
+            fitness_score
+            decode
+            build_sequence
+        Genes:
+            operators
+            silent
+            if relevant:
+              numbers
+              operators_conversion
