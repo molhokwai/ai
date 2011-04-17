@@ -1,17 +1,19 @@
 #!/usr/bin/python
 """
   Application of example from: http://www.ai-junkie.com/ga/intro/gat3.html
+
+  IMPLEMENT MULTITHREADING
+     - AT THE LEVEL OF THE ROULETTE WHEEL
+     - AT THE LEVEL OF THE POPULATION MAKING
+  ...USING PYTHON Threading MODULE
 """
 import math
 import random
 random.seed()
 
-from  Chromosome import Chromosome
-from Genes import Genes
-
-
 class Selection():
   genes=None
+  Chromosome=None
   
   target=42
   population_nr=1000  
@@ -20,9 +22,10 @@ class Selection():
 
   _population=[]
 
-  def __init__(self, genes, target=42, population_nr=1000,
+  def __init__(self, genes, Chromosome, target=42, population_nr=1000,
               crossover_probability=[7,10], mutation_probability=[1,1000]):
     self.genes=genes
+    self.Chromosome=Chromosome
     self.target=42
     self.population_nr=1000  
     self.crossover_probability=crossover_probability
@@ -36,7 +39,7 @@ class Selection():
       for j in range(self.genes.chromosome_bits_nr):
         bits+=str(random.choice([0,1]))
 
-      chromosome=Chromosome(self.genes, 23, bits)
+      chromosome=self.Chromosome(self.genes, 23, bits)
       self._population.append(chromosome)
   
   @property

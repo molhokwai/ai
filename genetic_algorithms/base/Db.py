@@ -7,7 +7,7 @@ class Db:
   def __init__(self, settings):
     self.settings = settings
     
-  def save(self, solution):
+  def save(self, solution, config):
     da = Da(self.settings)
     
     chromosomes=[]
@@ -23,12 +23,12 @@ class Db:
       da.execute('INSERT INTO Problem(name, description, target) VALUES(?, ?, ?)', 'c', parameters=[solution.problem['NAME'], solution.problem['DESCRIPTION'], str(solution.problem['TARGET'])])
       problem_row=da.execute('SELECT * FROM Problem WHERE name=? and target=?', 'r', parameters=[solution.problem['NAME'], str(solution.problem['TARGET'])])
 
-    solution.problem['ID']=int(problem_row[2])    
+    solution.problem['ID']=int(problem_row[3])    
     prv_best_fitness_score=0
     generation=da.execute('SELECT * FROM Solution WHERE Problem=?', 'r', parameters=[solution.problem['ID']])
     if generation:
       for i in range(len(generation)): prv_best_fitness_score+=generation[i][2]
-    
+
     if solution.best_generation.fitness_score>prv_best_fitness_score:
         solution.best_fitness_score=solution.best_generation.fitness_score
         da.execute('DELETE FROM Solution WHERE Problem=?', 'd', parameters=[solution.problem['ID']])
@@ -45,8 +45,23 @@ class Db:
           )
         da.bulk_execute(
           'INSERT INTO Solution(Problem, Chromosome, fitness_score, sequence, solution) VALUES(?, ?, ?, ?, ?) ', 'c', tuples=tuples)
+
+        best_solution_config = """{
+          \n\t'CONFIGURATION':{
+              \n\t\t'PROBLEM : %s '
+              \n\t\t'CHROMOSOMES : %s '
+              \n\t\t'GENES : %s '
+              \n\t\t'GENERATIONS : %s '
+          \n\t}
+        \n}'""" % (str(config.PROBLEM), 
+	        str(config.CHROMOSOMES),
+	        str(config.GENES),
+	        str(config.GENERATIONS))
+        da.execute('UPDATE Problem SET best_solution_config = ? WHERE id = ?', 'u', parameters=[best_solution_config, solution.problem['ID']])
+
+        return True 
     else:
         solution.best_fitness_score=prv_best_fitness_score
-
+        return False
     da.close()
 
