@@ -1,0 +1,15 @@
+{
+            
+	'CONFIGURATION':{
+                
+		'PROBLEM : {'TARGET': 42, 'DESCRIPTION': 'Given the digits 0 through 9 and the operators +, -, * and /,  find a sequence that will represent a given target number.', 'ID': 1, 'NAME': 'Target Number'} '
+                
+		'CHROMOSOMES : {'CHARACTER_NR': 20, 'CHARACTER_BITS': 4} '
+                
+		'GENES : {'MUTATION_PROBABILITY': [1, 1000], 'CROSSOVER_PROBABILITY': [1, 10], 'POPULATION_NR': 10000} '
+                
+		'GENERATIONS : {'NUMBER': 2} '
+            
+	}
+      
+}'

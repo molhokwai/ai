@@ -1,0 +1,2 @@
+#!/usr/bin/bash
+sudo python /home/herve/development/workspaces/learning/ai/genetic_algorithms/disc_area_fit/main.py
